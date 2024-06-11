@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+convertCSV(){
+
+}
+
 usage() {
 	echo "Usage: $0 [-i <inputPath>] [-o <outputPath>] [-d] [-e <secondInput>] [-t <term>]"
 	echo "Options:"
