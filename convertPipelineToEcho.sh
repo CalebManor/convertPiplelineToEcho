@@ -7,7 +7,8 @@ main() {
 	secondInput=""
 	term=""
 
-	while getops ":i:o:de:t:h" opt; do
+	while getopts ":i:o:de:t:h" opt; do
+	
 		case ${opt} in
 			i)
 				inputPath="${OPTARG}"
@@ -46,6 +47,4 @@ main() {
 	echo "Term: $term"
 }
 
-if ["$0" = "$BASH_SOURCE"]; then
-	main "$@"
-fi
+main "$@"
