@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
 
 getDepartments(){
+	local formattedPath=$1
+	local outputPath=$2
 
+	# Read CSV and generate JSON mapping
+
+	csvtool namedcol Course\ Code,Department $formattedPath | tail -n +2 | awk -F, '{
+		split($1, a, "-");
+		if (!a[1] in seen)) {
+			print "\"" a[1] "\": \"" $2 "\",";
+			seen[a[1]] = 1;
+		}
+	}' | sed '$ s/,$//' > temp.json
+
+	echo "{" > $outputPath
+	cat temp.json >> $outputPath
+	echo "}" >> $outputPath
+
+	rm temp.json
 }
 
 usage() {
