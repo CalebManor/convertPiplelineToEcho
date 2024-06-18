@@ -8,9 +8,8 @@ getDepartments(){
 
 	csvtool namedcol Course\ Code,Department $formattedPath | tail -n +2 | awk -F, '{
 		split($1, a, "-");
-		if (!a[1] in seen)) {
-			print "\"" a[1] "\": \"" $2 "\",";
-			seen[a[1]] = 1;
+		if (!seen[a[1]]++)) {
+			print "\"" a[1] "\": \"" $2 "\",";		
 		}
 	}' | sed '$ s/,$//' > temp.json
 
