@@ -50,13 +50,14 @@ main() {
 		esac
 	done
 	shift $((OPTIND -1))
-
-	# Do something with parsed arguments for testing
-	echo "Input path: $inputPath"
-	echo "Output path: $outputPath"
-	echo "Get departments: $getDepts"
-	echo "Second input: $secondInput"
-	echo "Term: $term"
+	
+	if [[ "$getDepts" == true ]]; then
+        	getDepartments "$inputPath" "$outputPath"
+  	elif [[ -n "$secondInput" ]]; then
+        	getEmails "$inputPath" "$secondInput" "$outputPath"
+   	else
+       		convertCSV "$inputPath" "$outputPath" "$term"
+    	fi
 }
 
 main "$@"
