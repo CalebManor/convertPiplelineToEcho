@@ -5,6 +5,7 @@ getDepartments(){
 	local outputPath=$2
 
 	# Read CSV and generate JSON mapping
+	# https://github.com/maroofi/csvtool
 
 	csvtool namedcol Course\ Code,Department $formattedPath | tail -n +2 | awk -F, '{
 		split($1, a, "-");
