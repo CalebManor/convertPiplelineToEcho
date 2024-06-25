@@ -7,7 +7,8 @@ getDepartments() {
 	# Read Echo CSV and generate JSON file which contains a mapping between subjects and departments
 	# https://github.com/maroofi/csvtool
 
-	csvtool namedcol Course\ Code,Department $formattedCSVPath | tail -n +2 | awk -F, '{ split($1, subjectArray, "-");
+	csvtool namedcol Course\ Code,Department $formattedCSVPath | tail -n +2 | awk -F, '{
+	        split($1, subjectArray, "-");
 		if (!seen[subjectArray[1]]++)){
 			print "\"" subjectArray[1] "\": \"" $2 "\",";		
 		}
