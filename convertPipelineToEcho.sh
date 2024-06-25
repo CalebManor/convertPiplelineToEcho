@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 
-getDepartments(){
-	local formattedPath=$1
-	local outputPath=$2
+getDepartments() {
+	local formattedCSVPath=$1
+	local outputJSONPath=$2
 
-	# Read CSV and generate JSON mapping
+	# Read Echo CSV and generate JSON file which contains a mapping between subjects and departments
 	# https://github.com/maroofi/csvtool
 
-	csvtool namedcol Course\ Code,Department $formattedPath | tail -n +2 | awk -F, '{
-		split($1, a, "-");
-		if (!seen[a[1]]++)) {
-			print "\"" a[1] "\": \"" $2 "\",";		
+	csvtool namedcol Course\ Code,Department $formattedCSVPath | tail -n +2 | awk -F, '{ split($1, subjectArray, "-");
+		if (!seen[subjectArray[1]]++)){
+			print "\"" subjectArray[1] "\": \"" $2 "\",";		
 		}
 	}' | sed '$ s/,$//' > temp.json
 
-	echo "{" > $outputPath
-	cat temp.json >> $outputPath
-	echo "}" >> $outputPath
+	echo "{" > $outputJSONPath
+	cat temp.json >> $outputJSONPath
+	echo "}" >> $outputJSONPath
 
 	rm temp.json
 }
@@ -24,35 +23,35 @@ getDepartments(){
 usage() {
 	echo "Usage: $0 [-i <inputPath>] [-o <outputPath>] [-d] [-e <secondInput>] [-t <term>]"
 	echo "Options:"
-	echo " -i <inputPath>   Path to input csv file."
+	echo " -i <inputPath>   Path to input Echo CSV file."
 	echo " -o <outputPath>  Path to output file. (Default: ./subjToDept.json)"
 	echo " -d               Only use this flag if you need to regenerate subjToDept.json"
-	echo " -e <secondInput> Takes a second path to try and determine name/email mapping. Pass Echo csv file to i argument."
+	echo " -e <secondInput> Takes a second path to try and determine name/email mapping. Pass Echo CSV file to i argument."
 	echo " -t <term>        The term for the converted file. (e.g. Fall 2021)"
 	exit 1
 }
 
 main() { 
-	inputPath=""
-	outputPath="./subjToDept.json"
-	getDepts=false
-	secondInput=""
-	term=""
+	local inputEchoCSVPath=""
+	local outputCSVPath="./subjToDept.json"
+	local regenerateSubjDeptJSON=false
+	local secondInputCSVPath=""
+	local term=""
 
 	while getopts ":i:o:de:t:h" opt; do
 	
 		case ${opt} in
 			i)
-				inputPath="${OPTARG}"
+				inputEchoCSVPath="${OPTARG}"
 				;;
 			o)
-				outputPath="${OPTARG}"
+				outputCSVPath="${OPTARG}"
 				;;
 			d)	
-				getDepts=true
+				regerateSubjDeptJSON=true
 				;;
 			e)
-				secondInput="${OPTARG}"
+				secondInputCSVPath="${OPTARG}"
 				;;
 			t)
 				term="${OPTARG}"
@@ -72,12 +71,12 @@ main() {
 	done
 	shift $((OPTIND -1))
 	
-	if [[ "$getDepts" == true ]]; then
-        	getDepartments "$inputPath" "$outputPath"
-  	elif [[ -n "$secondInput" ]]; then
-        	getEmails "$inputPath" "$secondInput" "$outputPath"
+	if [[ "$regerateDeptMap" == true ]]; then
+        	getDepartments "$inputEchoCSVPath" "$outputCSVPath"
+  	elif [[ -n "$secondInputCSVPath" ]]; then
+        	getEmails "$inputEchoCSVPath" "$secondInputCSVPath" "$outputCSVPath"
    	else
-       		convertCSV "$inputPath" "$outputPath" "$term"
+       		convertCSV "$inputEchoCSVPath" "$outputCSVPath" "$term"
     	fi
 }
 
