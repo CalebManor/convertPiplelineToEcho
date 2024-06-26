@@ -1,41 +1,41 @@
 #!/usr/bin/env bash
 
-convertCSV(){
+convertCSV() {
 
 }
 
 usage() {
 	echo "Usage: $0 [-i <inputPath>] [-o <outputPath>] [-d] [-e <secondInput>] [-t <term>]"
 	echo "Options:"
-	echo " -i <inputPath>   Path to input csv file."
+	echo " -i <inputPath>   Path to input Echo CSV file."
 	echo " -o <outputPath>  Path to output file. (Default: ./subjToDept.json)"
 	echo " -d               Only use this flag if you need to regenerate subjToDept.json"
-	echo " -e <secondInput> Takes a second path to try and determine name/email mapping. Pass Echo csv file to i argument."
+	echo " -e <secondInput> Takes a second path to try and determine name/email mapping. Pass Echo CSV file to i argument."
 	echo " -t <term>        The term for the converted file. (e.g. Fall 2021)"
 	exit 1
 }
 
 main() { 
-	inputPath=""
-	outputPath="./subjToDept.json"
-	getDepts=false
-	secondInput=""
-	term=""
+	local inputEchoCSVPath=""
+	local outputCSVPath="./subjToDept.json"
+	local regenerateSubjDeptJSON=false
+	local secondInputCSVPath=""
+	local term=""
 
 	while getopts ":i:o:de:t:h" opt; do
 	
 		case ${opt} in
 			i)
-				inputPath="${OPTARG}"
+				inputEchoCSVPath="${OPTARG}"
 				;;
 			o)
-				outputPath="${OPTARG}"
+				outputCSVPath="${OPTARG}"
 				;;
 			d)	
-				getDepts=true
+				regerateSubjDeptJSON=true
 				;;
 			e)
-				secondInput="${OPTARG}"
+				secondInputCSVPath="${OPTARG}"
 				;;
 			t)
 				term="${OPTARG}"
@@ -54,13 +54,15 @@ main() {
 		esac
 	done
 	shift $((OPTIND -1))
-
-	# Do something with parsed arguments for testing
-	echo "Input path: $inputPath"
-	echo "Output path: $outputPath"
-	echo "Get departments: $getDepts"
-	echo "Second input: $secondInput"
-	echo "Term: $term"
+	
+	if [[ "$regerateDeptMap" == true ]]; then
+        	getDepartments "$inputEchoCSVPath" "$outputCSVPath"
+  	elif [[ -n "$secondInputCSVPath" ]]; then
+        	getEmails "$inputEchoCSVPath" "$secondInputCSVPath" "$outputCSVPath"
+   	else
+       		convertCSV "$inputEchoCSVPath" "$outputCSVPath" "$term"
+    	fi
 }
 
 main "$@"
+	
