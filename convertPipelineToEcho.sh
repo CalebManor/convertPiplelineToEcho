@@ -24,6 +24,16 @@ getEmails() {
 		# Populate map with Instructor/Email mapping
 		nameToEmailMap["$instructorName"]="${associatedEmail:-none}"
 	done
+
+	# Write output to JSON file
+
+	{
+		echo "{"
+		for instructorName in "${!nameToEmailMap[@]}"; do
+			echo "\"$instructorName\": \"${nameToEmailMap[$instructorName]}\","	
+		done | sed '$ s/,$//'
+		echo "}" 
+	} > "$outputJSONPath"
 }
 
 usage() {
