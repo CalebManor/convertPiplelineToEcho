@@ -1,7 +1,29 @@
 #!/usr/bin/env bash
 
 getEmails() {
+	local formattedCSVPath=$1
+	local unformattedCSVPath=$2
+	local outputJSONPath=$3
 
+	declare -A nameToEmailMap
+	
+	# Get instructor names from CSV
+	tail -n +2 "$unformattedCSVPath" | awk -F',' '{print $2}' | while IFS= read -r instructorName; do
+
+		# Normalize instructor name to lowercase without spaces for association
+		lowerInstructorName="${instructorName,,}" 
+		lowerInstructorName="${lowerName// /}"
+
+		emailKey="lowerInstructorName"
+
+		#Extract instructor emails by matching the emailKey 
+
+		associatedEmail=$(tail -n +2 "formattedCSVPath" |
+		 awk -v emailKey="$emailKey" -F',' '$2 ~ emailKey {print $1; exit}')
+
+		# Populate map with Instructor/Email mapping
+		nameToEmailMap["$instructorName"]="${associatedEmail:-none}"
+	done
 }
 
 usage() {
