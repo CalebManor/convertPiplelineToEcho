@@ -1,24 +1,59 @@
 #!/usr/bin/env bash
 
-getDepartments() {
-	local formattedCSVPath=$1
-	local outputJSONPath=$2
+getDepartments(){
+	local formattedPath=$1
+	local outputPath=$2
 
-	# Read Echo CSV and generate JSON file which contains a mapping between subjects and departments
-	# https://github.com/maroofi/csvtool
+	# Read CSV and generate JSON mapping
 
-	csvtool namedcol Course\ Code,Department $formattedCSVPath | tail -n +2 | awk -F, '{
-	        split($1, subjectArray, "-");
-		if (!seen[subjectArray[1]]++)){
-			print "\"" subjectArray[1] "\": \"" $2 "\",";		
+	csvtool namedcol Course\ Code,Department $formattedPath | tail -n +2 | awk -F, '{
+		split($1, a, "-");
+		if (!seen[a[1]]++)) {
+			print "\"" a[1] "\": \"" $2 "\",";		
 		}
 	}' | sed '$ s/,$//' > temp.json
 
-	echo "{" > $outputJSONPath
-	cat temp.json >> $outputJSONPath
-	echo "}" >> $outputJSONPath
+	echo "{" > $outputPath
+	cat temp.json >> $outputPath
+	echo "}" >> $outputPath
 
 	rm temp.json
+}
+
+getEmails() {
+	local formattedCSVPath=$1
+	local unformattedCSVPath=$2
+	local outputJSONPath=$3
+
+	declare -A nameToEmailMap
+	
+	# Get instructor names from CSV
+	tail -n +2 "$unformattedCSVPath" | awk -F',' '{print $2}' | while IFS= read -r instructorName; do
+
+		# Normalize instructor name to lowercase without spaces for association
+		lowerInstructorName="${instructorName,,}" 
+		lowerInstructorName="${lowerName// /}"
+
+		emailKey="lowerInstructorName"
+
+		#Extract instructor emails by matching the emailKey 
+
+		associatedEmail=$(tail -n +2 "formattedCSVPath" |
+		 awk -v emailKey="$emailKey" -F',' '$2 ~ emailKey {print $1; exit}')
+
+		# Populate map with Instructor/Email mapping
+		nameToEmailMap["$instructorName"]="${associatedEmail:-none}"
+	done
+
+	# Write output to JSON file
+
+	{
+		echo "{"
+		for instructorName in "${!nameToEmailMap[@]}"; do
+			echo "\"$instructorName\": \"${nameToEmailMap[$instructorName]}\","	
+		done | sed '$ s/,$//'
+		echo "}" 
+	} > "$outputJSONPath"
 }
 
 usage() {
@@ -82,3 +117,4 @@ main() {
 }
 
 main "$@"
+	
