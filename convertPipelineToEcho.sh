@@ -1,7 +1,39 @@
 #!/usr/bin/env bash
 
 convertCSV() {
+	local inputCSV="$1"
+	local outputEcho="$2"
+	local term="$3"	
+	
+	declare -A subjToDept
+	declare -A nameToEmail
 
+	while IFS="=" read -r key value; do
+		subjToDept[$key]=$value
+	done < <(jq -r 'to_entries[] |"\(.key)=\(.value)"' subjToDept.json)
+
+	while IFS="=" read -r key value; do
+		nameToEmail[$key]=$value
+	done < <(jq -r 'to_entries[] | "\(.key)=\(.value)"' nameToEmail.json)
+
+	local org="HU - Main Campus"
+
+	echo "Organization, Department, Course Code, Course Name, Section Code, Primary Instructor Email, Secondary Instructor Emails" > "$outputEcho"
+
+	IFS=','
+	while read -r DEPT SUBJ TITLE INSTR; do
+		if [[ "$DEPT" == "Dept" ]]; then
+			continue 
+		fi
+	
+		local organization="$org"
+		local dept="${subjToDept[$SUBJ]:-}"
+		local courseCode="$SUBJ"
+		local className="$TITLE"
+		local email="${nameToEmail[$INST]:-TBA}"
+
+		echo "$orgName, $dept, $courseCode, $className, $term,, $email" >> "$outputEcho" 
+	done < "$inputCSV"	
 }
 
 usage() {
