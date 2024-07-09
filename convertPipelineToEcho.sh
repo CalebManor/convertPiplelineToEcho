@@ -47,21 +47,22 @@ convertCSV() {
 getDepartments(){
 	local formattedPath=$1
 	local outputPath=$2
+	local tempFile="temp.json"
 
 	# Read CSV and generate JSON mapping
 
-	csvtool namedcol Course\ Code,Department $formattedPath | tail -n +2 | awk -F, '{
+	awk -F ',' 'NR > 1 {
 		split($1, a, "-");
-		if (!seen[a[1]]++)) {
+		if (!seen[a[1]]++) {
 			print "\"" a[1] "\": \"" $2 "\",";		
 		}
-	}' | sed '$ s/,$//' > temp.json
+	}' "$formattedPath" | sed '$ s/,$//' > "$tempFile"
 
 	echo "{" > $outputPath
-	cat temp.json >> $outputPath
+	cat $tempFile  >> $outputPath
 	echo "}" >> $outputPath
 
-	rm temp.json
+	rm "$tempFile"
 }
 
 getEmails() {
@@ -81,7 +82,6 @@ getEmails() {
 		emailKey="lowerInstructorName"
 
 		#Extract instructor emails by matching the emailKey 
-
 		associatedEmail=$(tail -n +2 "formattedCSVPath" |
 		 awk -v emailKey="$emailKey" -F',' '$2 ~ emailKey {print $1; exit}')
 
@@ -107,13 +107,9 @@ usage() {
 	echo " -o <outputPath>  Path to output file. (Default: ./subjToDept.json)"
 	echo " -d               Only use this flag if you need to regenerate subjToDept.json"
 	echo " -e <secondInput> Takes a second path to try and determine name/email mapping. Pass Echo CSV file to i argument."
-<<<<<<< HEAD
 	echo " -t <term>        The term for the converted file. (e.g. Fall 2021)"
 	exit 1
 }
-=======
-	echo " -t <term>        The term for the converted file. (e.g. Fall 2021)" exit 1 }
->>>>>>> convertCSV
 
 main() { 
 	local inputEchoCSVPath=""
@@ -164,5 +160,4 @@ main() {
     	fi
 }
 
-main "$@"
-	
+main "$@"	
