@@ -5,6 +5,7 @@ The tool expects a JSON file mapping subjects to departments and another JSON fi
 
 ## Dependencies
 This tool has 1 dependency for the sake of brevity and readability and because it is intended only for a handful of users. 
+https://github.com/bobbyiliev/introduction-to-bash-scripting/blob/main/ebook/en/content/018-working-with-json-in-bash-using-jq.md
 
 ### Usage
 convertPipelineToEcho.sh [-i <inputPath>] [-o <outputPath>] [-d] [-e <secondInput>] [-t <term>]  
