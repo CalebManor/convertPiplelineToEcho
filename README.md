@@ -1,14 +1,16 @@
 # Pipeline To Echo CSV Converter
 This tool is a Bash conversion of a Python script used to convert Harding Pipeline CSV files to Echo compliant CSV files originally written by Joshua Toye.  
 
-https://github.com/JoshuaTT/pipelineCsvConverter  
+[https://github.com/JoshuaTT/pipelineCsvConverter](https://github.com/JoshuaTT/pipelineCsvConverter)  
 
 The tool expects a JSON file mapping subjects to departments and another JSON file mapping instructor names to emails. These are expected at ./subjToDept.json and ./nameToEmail.json respectively - both in reference to convertPipelineToEcho.py.
 
 ## Dependencies
 This tool has 1 dependency for the sake of brevity and readability and because it is intended only for a handful of users.  
 
-https://github.com/bobbyiliev/introduction-to-bash-scripting/blob/main/ebook/en/content/018-working-with-json-in-bash-using-jq.md
+jq  
+[https://jqlang.github.io/jq/
+](https://jqlang.github.io/jq/)  
 
 ### Usage
 convertPipelineToEcho.sh [-i <inputPath>] [-o <outputPath>] [-d] [-e <secondInput>] [-t <term>]  
