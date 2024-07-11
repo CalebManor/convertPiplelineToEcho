@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 convertCSV() {
+	# Loads JSON Data mappings from Harding Pipeline CSV into associative arrays and uses them for the  Echo CSV conversion
+	
 	local inputCSV="$1"
 	local outputEcho="$2"
 	local term="$3"	
@@ -45,6 +47,8 @@ convertCSV() {
 }
 
 getDepartments(){
+	# Reads data from CSV and writes a JSON file containing associations between subjects and departments
+	
 	local formattedPath=$1
 	local outputPath=$2
 	local tempFile="temp.json"
@@ -70,7 +74,7 @@ getEmails() {
 	local unformattedCSVPath=$2
 	local outputJSONPath=$3
 
-	declare -A nameToEmailMap
+	declare -A nameToEmail
 	
 	# Get instructor names from CSV
 	tail -n +2 "$unformattedCSVPath" | awk -F',' '{print $2}' | while IFS= read -r instructorName; do
@@ -86,15 +90,15 @@ getEmails() {
 		 awk -v emailKey="$emailKey" -F',' '$2 ~ emailKey {print $1; exit}')
 
 		# Populate map with Instructor/Email mapping
-		nameToEmailMap["$instructorName"]="${associatedEmail:-none}"
+		nameToEmail["$instructorName"]="${associatedEmail:-none}"
 	done
 
 	# Write output to JSON file
 
 	{
 		echo "{"
-		for instructorName in "${!nameToEmailMap[@]}"; do
-			echo "\"$instructorName\": \"${nameToEmailMap[$instructorName]}\","	
+		for instructorName in "${!nameToEmail[@]}"; do
+			echo "\"$instructorName\": \"${nameToEmail[$instructorName]}\","	
 		done | sed '$ s/,$//'
 		echo "}" 
 	} > "$outputJSONPath"
@@ -103,7 +107,7 @@ getEmails() {
 usage() {
 	echo "Usage: $0 [-i <inputPath>] [-o <outputPath>] [-d] [-e <secondInput>] [-t <term>]"
 	echo "Options:"
-	echo " -i <inputPath>   Path to input Echo CSV file."
+	echo " -i <inputPath>   Path to input CSV file."
 	echo " -o <outputPath>  Path to output file. (Default: ./subjToDept.json)"
 	echo " -d               Only use this flag if you need to regenerate subjToDept.json"
 	echo " -e <secondInput> Takes a second path to try and determine name/email mapping. Pass Echo CSV file to i argument."
@@ -112,7 +116,7 @@ usage() {
 }
 
 main() { 
-	local inputEchoCSVPath=""
+	local inputCSVPath=""
 	local outputCSVPath="./subjToDept.json"
 	local regenerateSubjDeptJSON=false
 	local secondInputCSVPath=""
@@ -122,7 +126,7 @@ main() {
 	
 		case ${opt} in
 			i)
-				inputEchoCSVPath="${OPTARG}"
+				inputCSVPath="${OPTARG}"
 				;;
 			o)
 				outputCSVPath="${OPTARG}"
@@ -152,11 +156,11 @@ main() {
 	shift $((OPTIND -1))
 	
 	if [[ "$regerateDeptMap" == true ]]; then
-        	getDepartments "$inputEchoCSVPath" "$outputCSVPath"
+        	getDepartments "$inputCSVPath" "$outputCSVPath"
   	elif [[ -n "$secondInputCSVPath" ]]; then
-        	getEmails "$inputEchoCSVPath" "$secondInputCSVPath" "$outputCSVPath"
+        	getEmails "$inputCSVPath" "$secondInputCSVPath" "$outputCSVPath"
    	else
-       		convertCSV "$inputEchoCSVPath" "$outputCSVPath" "$term"
+       		convertCSV "$inputCSVPath" "$outputCSVPath" "$term"
     	fi
 }
 
