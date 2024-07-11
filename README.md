@@ -1,5 +1,5 @@
 # Pipeline To Echo CSV Converter
-This tool is a Bash conversion of a Python script used to convert Harding Pipeline CSV files to Echo compliant CSV files - originally written by Joshua Toye.  
+This tool is a Bash conversion of a Python script used to convert Harding Pipeline CSV files to Echo compliant CSV files originally written by Joshua Toye.  
 
 [https://github.com/JoshuaTT/pipelineCsvConverter](https://github.com/JoshuaTT/pipelineCsvConverter)  
 
